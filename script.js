@@ -5,6 +5,8 @@ const cityName = document.getElementById('cityName');
 const temp = document.getElementById('temp');
 const condition = document.getElementById('condition');
 const humidity = document.getElementById('humidity');
+const weatherInfo = document.getElementById('weatherInfo');
+const errorDiv = document.getElementById('error');
 
 // Event Listeners
 searchBtn.addEventListener('click', getWeather);
@@ -18,27 +20,37 @@ async function getWeather() {
     const city = cityInput.value.trim();
 
     if (!city) {
-        alert('Please enter a city name');
+        showError('Please enter a city name');
         return;
     }
 
     try {
         const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
         const data = await response.json();
-        console.log('Weather data:', data); // For debugging
 
-        // Update UI with weather data
-        cityName.textContent = data.location.name;
-        temp.textContent = data.current.temp_c;
-        condition.textContent = data.current.condition.text;
-        humidity.textContent = data.current.humidity;
-    } catch (err) {
-        console.error('Error:', err); // For debugging
-        alert('Error fetching weather data. Please check your API key or city name.');
+        if (data.error) {
+            showError(data.error.message || 'Error fetching weather data');
+            return;
+        }
+
+        const { current, location } = data;
+        
+        // Update weather information
+        document.getElementById('temperature').textContent = `Temperature: ${current.temp_c}°C`;
+        document.getElementById('condition').textContent = `Condition: ${current.condition.text}`;
+        document.getElementById('humidity').textContent = `Humidity: ${current.humidity}%`;
+        document.getElementById('windSpeed').textContent = `Wind Speed: ${current.wind_kph} km/h`;
+
+        // Hide error and show weather info
+        errorDiv.classList.remove('show');
+        weatherInfo.style.display = 'block';
+    } catch (error) {
+        showError('Error fetching weather data. Please try again.');
     }
+}
+
+function showError(message) {
+    errorDiv.textContent = message;
+    errorDiv.classList.add('show');
+    document.getElementById('weatherInfo').style.display = 'none';
 } 
