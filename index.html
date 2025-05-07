@@ -8,23 +8,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Weather App</h1>
         <div class="search-box">
             <input type="text" id="cityInput" placeholder="Enter city name...">
-            <button onclick="getWeather()">Search</button>
+            <button id="searchBtn">Search</button>
         </div>
         <div class="weather-info" id="weatherInfo">
             <h2>Weather Details</h2>
-            <p id="temperature"></p>
+            <p id="temp"></p>
             <p id="condition"></p>
             <p id="humidity"></p>
             <p id="windSpeed"></p>
         </div>
         <div class="error" id="error"></div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html> 

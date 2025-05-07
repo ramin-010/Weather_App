@@ -1,56 +1,41 @@
 // DOM Elements
-const cityInput = document.getElementById('cityInput');
-const searchBtn = document.getElementById('searchBtn');
-const cityName = document.getElementById('cityName');
+const city = document.getElementById('cityInput');
+const search = document.getElementById('searchBtn');
 const temp = document.getElementById('temp');
 const condition = document.getElementById('condition');
 const humidity = document.getElementById('humidity');
 const weatherInfo = document.getElementById('weatherInfo');
+const windspeed = document.getElementById('windSpeed');
 const errorDiv = document.getElementById('error');
 
-// Event Listeners
-searchBtn.addEventListener('click', getWeather);
-cityInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        getWeather();
-    }
-});
+search.addEventListener("click", getWeather);
 
 async function getWeather() {
-    const city = cityInput.value.trim();
-
-    if (!city) {
-        showError('Please enter a city name');
-        return;
-    }
-
+   
     try {
-        const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`);
-        const data = await response.json();
-
-        if (data.error) {
-            showError(data.error.message || 'Error fetching weather data');
+        const cityName = city.value.trim();
+        if (!cityName) {
+            alert('Please enter a city name');
             return;
         }
 
-        const { current, location } = data;
-        
-        // Update weather information
-        document.getElementById('temperature').textContent = `Temperature: ${current.temp_c}°C`;
-        document.getElementById('condition').textContent = `Condition: ${current.condition.text}`;
-        document.getElementById('humidity').textContent = `Humidity: ${current.humidity}%`;
-        document.getElementById('windSpeed').textContent = `Wind Speed: ${current.wind_kph} km/h`;
+        const response = await axios.get(`/api/weather?city=${encodeURIComponent(cityName)}`);
+        const data = response.data;
 
-        // Hide error and show weather info
-        errorDiv.classList.remove('show');
+        // Update UI with weather data
+        temp.textContent = `${data.current.temp_c}°C`;
+        condition.textContent = data.current.condition.text;
+        humidity.textContent = `${data.current.humidity}%`;
+        windspeed.textContent = `${data.current.wind_kph} km/h`;
+
+        // Show weather info and hide error
         weatherInfo.style.display = 'block';
-    } catch (error) {
-        showError('Error fetching weather data. Please try again.');
+        errorDiv.classList.remove('show');
+
+    } catch (err) {
+        console.error("Error:", err.message);
+        errorDiv.textContent = 'Error fetching weather data. Please try again.';
+        errorDiv.classList.add('show');
+        weatherInfo.style.display = 'none';
     }
 }
-
-function showError(message) {
-    errorDiv.textContent = message;
-    errorDiv.classList.add('show');
-    document.getElementById('weatherInfo').style.display = 'none';
-} 
